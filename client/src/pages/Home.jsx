@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from "react-router-dom"
 import { Camera, Video, BrainCircuit, Users, BookOpen, Heart, Github, Twitter, Linkedin } from 'lucide-react'
 import "./home.css"
-import team from "./team.jpg"
+// import team from "./team.jpg"
 import hero from "./hero.jpg"
 const HomePage = () => {
   return (
@@ -143,9 +143,9 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-            <div className="about-image">
+            {/* <div className="about-image">
               <img src={team} alt="Our Team" className='team' />
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
