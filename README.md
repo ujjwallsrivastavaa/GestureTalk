@@ -44,7 +44,7 @@ Follow these steps to set up and run the project:
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/ujjwallsrivastavaa/GestureTalk.git
-cd GestureGenius
+cd GestureTalk
 ```
 
 ### 2. Set up the Client (React Frontend)
