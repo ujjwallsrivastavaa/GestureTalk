@@ -1,4 +1,4 @@
-# HandTalk - ASL Detector in Video Calls
+# GestureTalk - ASL Detector in Video Calls
 
 
 ## Overview
