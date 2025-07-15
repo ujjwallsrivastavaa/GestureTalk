@@ -10,7 +10,7 @@ const HomePage = () => {
      <nav className="asl-navbar">
   <div className="asl-container">
     <Link to="/" className="asl-logo">
-     GestureGenius
+     GestureTalk
     </Link>
     <ul className="asl-nav-links">
       <li><Link to="/">Home</Link></li>
@@ -207,7 +207,7 @@ const HomePage = () => {
         <div className="container">
           <div className="footer-content">
             <div className="footer-section">
-              <h3>🤟 GestureGenius</h3>
+              <h3>🤟 GestureTalk</h3>
               <p>Breaking communication barriers with technology</p>
               <div className="social-links">
                 <a href="#" aria-label="Github">

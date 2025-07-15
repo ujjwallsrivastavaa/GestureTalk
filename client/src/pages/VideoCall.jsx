@@ -20,7 +20,7 @@ const VideoCall = () => {
   const [remotePrediction, setRemotePrediction] = useState({ class: '', confidence: 0 });
 
   const [localMessage, setLocalMessage] = useState('');
-const [remoteMessage, setRemoteMessage] = useState('');
+  const [remoteMessage, setRemoteMessage] = useState('');
   const socketRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const localVideoRef = useRef(null);
@@ -41,88 +41,88 @@ const [remoteMessage, setRemoteMessage] = useState('');
   useEffect(() => {
     console.log('Call status changed:', isInCall);
   }, [isInCall]);
-  
+
   useEffect(() => {
     console.log('Video status changed:', isVideoOff);
   }, [isVideoOff]);
-  
-const captureImageFromVideo = () => {
-  if (!localVideoRef.current) return null;
 
-  const canvas = document.createElement('canvas');
-  const video = localVideoRef.current;
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0);
-  
-  // Get base64 string
-  return canvas.toDataURL('image/jpeg', 0.8);
-};
-const getPrediction = async () => {
-  console.log('getPrediction called');
-  try {
+  const captureImageFromVideo = () => {
+    if (!localVideoRef.current) return null;
+
+    const canvas = document.createElement('canvas');
+    const video = localVideoRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+
+    // Get base64 string
+    return canvas.toDataURL('image/jpeg', 0.8);
+  };
+  const getPrediction = async () => {
+    console.log('getPrediction called');
+    try {
       console.log('Capturing image from video');
       const imageData = captureImageFromVideo();
       if (!imageData) {
-          console.log('No image data captured from video');
-          return;
+        console.log('No image data captured from video');
+        return;
       }
       console.log('Image captured successfully');
 
       console.log('Sending prediction request to server');
-      const response = await fetch('http://localhost:5000/predict', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: imageData })
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/predict`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageData })
       });
 
       console.log('Prediction response received:', response.status);
 
       if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const prediction = await response.json();
       console.log('Prediction result:', prediction);
 
       if (prediction.error) {
-          console.error('Prediction error:', prediction.error);
-          return;
+        console.error('Prediction error:', prediction.error);
+        return;
       }
 
       console.log('Setting local prediction:', prediction);
-       setLocalPrediction(prediction);
+      setLocalPrediction(prediction);
 
 
       console.log('Emitting prediction to peer:', currentCallId);
       socketRef.current.emit('asl-prediction', { toSocketId: currentCallId, prediction });
 
-  } catch (error) {
+    } catch (error) {
       console.error('Error in getPrediction:', error);
-  }
-};
+    }
+  };
 
 
-// Update the startASLDetection function to add error handling:
-const startASLDetection = () => {
-  if (predictionIntervalRef.current) {
+  // Update the startASLDetection function to add error handling:
+  const startASLDetection = () => {
+    if (predictionIntervalRef.current) {
       console.log('Clearing existing prediction interval');
       stopASLDetection();
-  }
+    }
 
-  console.log('Starting ASL detection');
-  
-  predictionIntervalRef.current = setInterval(() => {
-      
+    console.log('Starting ASL detection');
+
+    predictionIntervalRef.current = setInterval(() => {
+
 
       console.log("Attempting to get prediction");
       getPrediction().catch(error => {
-          console.error('Error in ASL detection loop:', error);
+        console.error('Error in ASL detection loop:', error);
       });
 
-  }, 1000);
-};
+    }, 1000);
+  };
 
 
 
@@ -162,7 +162,7 @@ const startASLDetection = () => {
       console.log('Incoming call from:', from);
       setIncomingCall({ from, offer });
       setCurrentCallId(from); // Ensure call ID is set when receiving a call
-  });
+    });
     socketRef.current.on('call-accepted', async (answer) => {
       console.log('Call accepted, setting remote description');
       try {
@@ -193,13 +193,13 @@ const startASLDetection = () => {
       setBlinkEffect(true);
       setTimeout(() => setBlinkEffect(false), 1000);
     });
-    
+
 
     return () => {
       cleanupCall();
       socketRef.current?.disconnect();
     };
-    
+
   }, []);
 
 
@@ -261,15 +261,15 @@ const startASLDetection = () => {
       });
       console.log('Media stream obtained:', stream);
       setLocalStream(stream);
-      
+
       if (localVideoRef.current) {
         console.log('Setting video source');
         localVideoRef.current.srcObject = stream;
-        
+
         localVideoRef.current.onplay = () => {
           console.log('Local video started playing');
         };
-        
+
         localVideoRef.current.onloadedmetadata = () => {
           console.log('Video metadata loaded');
           console.log('Video dimensions:', {
@@ -280,7 +280,7 @@ const startASLDetection = () => {
       } else {
         console.error('Local video ref not available');
       }
-      
+
       return stream;
     } catch (error) {
       console.error('Error accessing media devices:', error);
@@ -291,41 +291,41 @@ const startASLDetection = () => {
 
   const initiateCall = async () => {
     if (!targetUserId.trim()) {
-        alert('Please enter a user email to call');
-        return;
+      alert('Please enter a user email to call');
+      return;
     }
 
     try {
-        console.log('Initiating call');
-        setCurrentCallId(targetUserId); 
-        setIsInCall(true);
+      console.log('Initiating call');
+      setCurrentCallId(targetUserId);
+      setIsInCall(true);
 
-        const stream = await startLocalStream();
-        const pc = createPeerConnection();
+      const stream = await startLocalStream();
+      const pc = createPeerConnection();
 
-        stream.getTracks().forEach(track => {
-            pc.addTrack(track, stream);
-        });
+      stream.getTracks().forEach(track => {
+        pc.addTrack(track, stream);
+      });
 
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
 
-        socketRef.current.emit('initiate-call', {
-            toEmail: targetUserId, 
-            offer: pc.localDescription
-        });
+      socketRef.current.emit('initiate-call', {
+        toEmail: targetUserId,
+        offer: pc.localDescription
+      });
 
-        console.log('Call initiated, starting ASL detection');
-        startASLDetection();
+      console.log('Call initiated, starting ASL detection');
+      startASLDetection();
     } catch (error) {
-        console.error('Error initiating call:', error);
-        cleanupCall();
+      console.error('Error initiating call:', error);
+      cleanupCall();
     }
-};
-const acceptCall = async () => {
-  if (!incomingCall) return;
+  };
+  const acceptCall = async () => {
+    if (!incomingCall) return;
 
-  try {
+    try {
       console.log('Accepting call');
       setCurrentCallId(incomingCall.from); // Ensure call ID is set
       setIsInCall(true);
@@ -333,7 +333,7 @@ const acceptCall = async () => {
       const pc = createPeerConnection();
 
       stream.getTracks().forEach(track => {
-          pc.addTrack(track, stream);
+        pc.addTrack(track, stream);
       });
 
       await pc.setRemoteDescription(new RTCSessionDescription(incomingCall.offer));
@@ -342,41 +342,41 @@ const acceptCall = async () => {
       await pc.setLocalDescription(answer);
 
       socketRef.current.emit('accept-call', {
-          to: incomingCall.from,
-          answer: pc.localDescription
+        to: incomingCall.from,
+        answer: pc.localDescription
       });
 
       setIncomingCall(null);
       console.log('Call accepted, starting ASL detection');
       startASLDetection();
-  } catch (error) {
+    } catch (error) {
       console.error('Error accepting call:', error);
       cleanupCall();
-  }
-};
-  
-const cleanupCall = () => {
-console.log("Cleaning up call and stopping ASL detection.");
-stopASLDetection();
-if (localStream) {
-    localStream.getTracks().forEach(track => track.stop());
-}
-if (peerConnectionRef.current) {
-    peerConnectionRef.current.close();
-}
-setLocalStream(null);
-setIsInCall(false);
-setIncomingCall(null);
-setCurrentCallId(null);  // Reset call ID
-setIsAudioMuted(false);
-setIsVideoOff(false);
-setLocalPrediction({ class: '', confidence: 0 });
-setRemotePrediction({ class: '', confidence: 0 });
+    }
+  };
 
-if (localVideoRef.current) localVideoRef.current.srcObject = null;
-if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
-};
-  
+  const cleanupCall = () => {
+    console.log("Cleaning up call and stopping ASL detection.");
+    stopASLDetection();
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+    }
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+    }
+    setLocalStream(null);
+    setIsInCall(false);
+    setIncomingCall(null);
+    setCurrentCallId(null);  // Reset call ID
+    setIsAudioMuted(false);
+    setIsVideoOff(false);
+    setLocalPrediction({ class: '', confidence: 0 });
+    setRemotePrediction({ class: '', confidence: 0 });
+
+    if (localVideoRef.current) localVideoRef.current.srcObject = null;
+    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+  };
+
   const endCall = () => {
     socketRef.current.emit('end-call', { to: currentCallId });
     cleanupCall();
@@ -396,7 +396,7 @@ if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
       const videoTrack = localStream.getVideoTracks()[0];
       videoTrack.enabled = !videoTrack.enabled;
       setIsVideoOff(!isVideoOff);
-      
+
       console.log('Video enabled:', videoTrack.enabled);
       if (!videoTrack.enabled) {
         console.log('Video disabled, stopping ASL detection');
@@ -405,25 +405,26 @@ if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
         console.log('Video enabled, restarting ASL detection');
         startASLDetection();
       }
-    }}
+    }
+  }
 
-    useEffect(() => {
-      if (localPrediction.class) {
-        updateLocalMessage(localPrediction.class);
-      }
-    }, [localPrediction]);
-  
-    const sendMessage = () => {
-      if (localMessage.trim()) {
-        socketRef.current.emit('send-message', { toSocketId: currentCallId, message: localMessage });
-        setLocalMessage('');
-      }
-    };
-    return (
-      <div className="app-container">
-       <nav className="asl-navbar">
+  useEffect(() => {
+    if (localPrediction.class) {
+      updateLocalMessage(localPrediction.class);
+    }
+  }, [localPrediction]);
+
+  const sendMessage = () => {
+    if (localMessage.trim()) {
+      socketRef.current.emit('send-message', { toSocketId: currentCallId, message: localMessage });
+      setLocalMessage('');
+    }
+  };
+  return (
+    <div className="app-container">
+      <nav className="asl-navbar">
         <div className="asl-container">
-          <Link to="/" className="asl-logo">GestureGenius</Link>
+          <Link to="/" className="asl-logo">GestureTalk</Link>
           <ul className="asl-nav-links">
             <li><Link to="/">Home</Link></li>
             <li><Link to="/self-testing">Self Testing</Link></li>
@@ -434,58 +435,58 @@ if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
         </div>
       </nav>
 
-        <div className="main-container">
-          {!isRegistered ? (
-            <div className="register-box">
-              <h2>Register to Start</h2>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email to register"
-                className="register-input"
-              />
-              <button onClick={registerEmail} className="register-btn">
-                Register
-              </button>
+      <div className="main-container">
+        {!isRegistered ? (
+          <div className="register-box">
+            <h2>Register to Start</h2>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email to register"
+              className="register-input"
+            />
+            <button onClick={registerEmail} className="register-btn">
+              Register
+            </button>
+          </div>
+        ) : (
+          <div className="video-call-wrapper">
+            {/* User Info Section */}
+            <div className="user-panel">
+              <div className="user-id">
+                <h2>Your ID: {email}</h2>
+              </div>
+              <div className="call-actions">
+                <input
+                  type="email"
+                  value={targetUserId}
+                  onChange={(e) => setTargetUserId(e.target.value)}
+                  placeholder="Enter email ID to call"
+                  className="call-input"
+                />
+                {!isInCall && (
+                  <button onClick={initiateCall} className="call-btn">
+                    <FaPhone /> Call
+                  </button>
+                )}
+              </div>
             </div>
-          ) : (
-            <div className="video-call-wrapper">
-              {/* User Info Section */}
-              <div className="user-panel">
-                <div className="user-id">
-                  <h2>Your ID: {email}</h2>
-                </div>
-                <div className="call-actions">
-                  <input
-                    type="email"
-                    value={targetUserId}
-                    onChange={(e) => setTargetUserId(e.target.value)}
-                    placeholder="Enter email ID to call"
-                    className="call-input"
-                  />
-                  {!isInCall && (
-                    <button onClick={initiateCall} className="call-btn">
-                      <FaPhone /> Call
-                    </button>
-                  )}
+
+            {/* Incoming Call Alert */}
+            {incomingCall && (
+              <div className="incoming-call-alert">
+                <div className="alert-content">
+                  <p>Incoming call from {incomingCall.from}</p>
+                  <button onClick={acceptCall} className="accept-btn">
+                    <FaPhone /> Accept
+                  </button>
                 </div>
               </div>
-    
-              {/* Incoming Call Alert */}
-              {incomingCall && (
-                <div className="incoming-call-alert">
-                  <div className="alert-content">
-                    <p>Incoming call from {incomingCall.from}</p>
-                    <button onClick={acceptCall} className="accept-btn">
-                      <FaPhone /> Accept
-                    </button>
-                  </div>
-                </div>
-              )}
-    
-             
-              <div className="maincont">
+            )}
+
+
+            <div className="maincont">
               <div className="streams-container">
                 <div className="video-stream local">
                   <video
@@ -541,36 +542,37 @@ if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
                   </div>
                 </div>
               </div>
-              </div>
-    
-              {/* Call Controls */}
-              {isInCall && (
-                <div className="call-controls">
-                  <button
-                    className={`control-btn ${isAudioMuted ? 'muted' : ''}`}
-                    onClick={toggleAudio}
-                  >
-                    {isAudioMuted ? <FaMicrophoneSlash /> : <FaMicrophone />}
-                  </button>
-                  <button
-                    className={`control-btn ${isVideoOff ? 'disabled' : ''}`}
-                    onClick={toggleVideo}
-                  >
-                    {isVideoOff ? <FaVideoSlash /> : <FaVideo />}
-                  </button>
-                  <button
-                    className="control-btn end"
-                    onClick={endCall}
-                  >
-                    <FaPhoneSlash />
-                  </button>
-                </div>
-              )}
             </div>
-          )}
-        </div>
+
+            {/* Call Controls */}
+            {isInCall && (
+              <div className="call-controls">
+                <button
+                  className={`control-btn ${isAudioMuted ? 'muted' : ''}`}
+                  onClick={toggleAudio}
+                >
+                  {isAudioMuted ? <FaMicrophoneSlash /> : <FaMicrophone />}
+                </button>
+                <button
+                  className={`control-btn ${isVideoOff ? 'disabled' : ''}`}
+                  onClick={toggleVideo}
+                >
+                  {isVideoOff ? <FaVideoSlash /> : <FaVideo />}
+                </button>
+                <button
+                  className="control-btn end"
+                  onClick={endCall}
+                >
+                  <FaPhoneSlash />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    );}
+    </div>
+  );
+}
 
 
 export default VideoCall;

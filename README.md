@@ -2,7 +2,7 @@
 
 
 ## Overview
-HandTalk is a real-time American Sign Language (ASL) detection system integrated into video calls. Our project aims to facilitate communication for individuals using ASL by recognizing hand gestures and converting them into text during live video calls. The system utilizes a pre-trained [MobileNet](https://www.researchgate.net/publication/339806434_Efficient_mobilenet_architecture_as_image_recognition_on_mobile_and_embedded_devices) model, which we fine-tuned on over 30,000 images by unfreezing 10 layers to enhance ASL recognition accuracy.
+GestureTalk is a real-time American Sign Language (ASL) detection system integrated into video calls. Our project aims to facilitate communication for individuals using ASL by recognizing hand gestures and converting them into text during live video calls. The system utilizes a pre-trained [MobileNet](https://www.researchgate.net/publication/339806434_Efficient_mobilenet_architecture_as_image_recognition_on_mobile_and_embedded_devices) model, which we fine-tuned on over 30,000 images by unfreezing 10 layers to enhance ASL recognition accuracy.
 
 ## Features
 - **Real-time ASL Detection in Video Calls:** Users can communicate using sign language, and our model translates it into text messages in real-time.
@@ -28,7 +28,7 @@ We have implemented several APIs in our Python backend:
 
 ## Project Structure
 ```
-HandTalk/
+GestureTalk/
 │── client/          # Contains React components
 │── server/
 │   ├── best_model.keras  # Trained model for ASL prediction

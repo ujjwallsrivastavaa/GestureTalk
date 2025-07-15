@@ -40,7 +40,7 @@ const Learn = () => {
        <nav className="asl-navbar">
         <div className="asl-container">
           <Link to="/" className="asl-logo">
-           GestureGenius
+           GestureTalk
           </Link>
           <ul className="asl-nav-links">
             <li><Link to="/">Home</Link></li>
